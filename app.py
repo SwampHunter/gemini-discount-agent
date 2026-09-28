@@ -50,7 +50,7 @@ if user_prompt := st.chat_input("Наприклад: Скільки коштув
         with st.chat_message("assistant"):
             with st.spinner("Агент аналізує запит..."):
                 response = client.models.generate_content(
-                    model='gemini-3.8-flash',
+                    model='gemini-3.6-flash',
                     contents=history_contents,
                     config=config
                 )

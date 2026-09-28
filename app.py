@@ -50,7 +50,7 @@ if user_prompt := st.chat_input("Наприклад: Скільки коштув
         with st.chat_message("assistant"):
             with st.spinner("Агент аналізує запит..."):
                 response = client.models.generate_content(
-                    model='gemini-2.0-flash',
+                    model='gemini-3.8-flash',
                     contents=history_contents,
                     config=config
                 )
@@ -67,7 +67,7 @@ if user_prompt := st.chat_input("Наприклад: Скільки коштув
                             )
 
                             followup_response = client.models.generate_content(
-                                model='gemini-2.0-flash',
+                                model='gemini-3.8-flash',
                                 contents=[
                                     types.Content(role="user", parts=[types.Part.from_text(text=user_prompt)]),
                                     types.Content(role="model", parts=[types.Part.from_function_call(name=call.name, args=call.args)]),

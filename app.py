@@ -21,7 +21,7 @@ for message in st.session_state.messages:
 
 if user_prompt := st.chat_input("Наприклад: Скільки коштуватиме куртка за 2400 грн зі знижкою 15%?"):
     if not api_key:
-        st.error("Введіть свій Gemini API Key у полі вище!")
+        st.error("Будь ласка, вкажіть API ключ у полі вище.")
         st.stop()
 
     st.session_state.messages.append({"role": "user", "content": user_prompt})
@@ -29,7 +29,11 @@ if user_prompt := st.chat_input("Наприклад: Скільки коштув
         st.markdown(user_prompt)
 
     try:
-        client = genai.Client(api_key=api_key)
+        # Для ключів формату AQ. ключ потрібно додатково передавати в http_options
+        client = genai.Client(
+            api_key=api_key,
+            http_options={'headers': {'x-goog-api-key': api_key}}
+        )
 
         config = types.GenerateContentConfig(
             tools=[calculate_discount],
@@ -57,7 +61,7 @@ if user_prompt := st.chat_input("Наприклад: Скільки коштув
                     for call in response.function_calls:
                         if call.name == "calculate_discount":
                             args = call.args
-                            st.info(f"⚙️ **Автоматичний виклик `calculate_discount`** (`price`={args['price']}, `discount_percent`={args['discount_percent']})")
+                            st.info(f"⚙️ **Виклик функції `calculate_discount`**: `price`={args['price']}, `discount_percent`={args['discount_percent']}")
                             
                             fn_result = calculate_discount(
                                 price=float(args['price']), 
@@ -83,5 +87,6 @@ if user_prompt := st.chat_input("Наприклад: Скільки коштув
 
                 st.markdown(final_text)
                 st.session_state.messages.append({"role": "assistant", "content": final_text})
+
     except Exception as e:
-        st.error(f"Помилка при виконанні запиту: {e}")
+        st.error(f"Помилка авторизації або виконання: {e}")

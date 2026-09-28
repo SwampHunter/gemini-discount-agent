@@ -10,7 +10,7 @@ def calculate_discount(price: float, discount_percent: float) -> str:
 st.set_page_config(page_title="AI-агент Знижок", page_icon="🛍️")
 st.title("🛍️ AI-агент: Шопінг-помічник")
 
-api_key = st.text_input("Введіть свій Google Gemini API Key (починається з AIza...):", type="password")
+api_key_input = st.text_input("Введіть свій Google Gemini API Key:", type="password")
 
 if "messages" not in st.session_state:
     st.session_state.messages = []
@@ -20,16 +20,18 @@ for message in st.session_state.messages:
         st.markdown(message["content"])
 
 if user_prompt := st.chat_input("Наприклад: Скільки коштуватиме куртка за 2400 грн зі знижкою 15%?"):
-    if not api_key:
-        st.error("Введіть свій Gemini API Key у полі вище!")
+    if not api_key_input:
+        st.error("Будь ласка, вкажіть API ключ у полі вище.")
         st.stop()
+
+    clean_api_key = api_key_input.strip()
 
     st.session_state.messages.append({"role": "user", "content": user_prompt})
     with st.chat_message("user"):
         st.markdown(user_prompt)
 
     try:
-        client = genai.Client(api_key=api_key.strip())
+        client = genai.Client(api_key=clean_api_key)
 
         config = types.GenerateContentConfig(
             tools=[calculate_discount],
@@ -57,7 +59,7 @@ if user_prompt := st.chat_input("Наприклад: Скільки коштув
                     for call in response.function_calls:
                         if call.name == "calculate_discount":
                             args = call.args
-                            st.info(f"⚙️ **Виклик функції `calculate_discount`**: `price`={args['price']}, `discount_percent`={args['discount_percent']}")
+                            st.info(f"⚙️ **Виклик `calculate_discount`**: `price`={args['price']}, `discount_percent`={args['discount_percent']}")
                             
                             fn_result = calculate_discount(
                                 price=float(args['price']), 
@@ -85,4 +87,4 @@ if user_prompt := st.chat_input("Наприклад: Скільки коштув
                 st.session_state.messages.append({"role": "assistant", "content": final_text})
 
     except Exception as e:
-        st.error(f"Помилка авторизації або виконання: {e}")
+        st.error(f"Помилка виконання запиту: {e}")

@@ -10,7 +10,7 @@ def calculate_discount(price: float, discount_percent: float) -> str:
 st.set_page_config(page_title="AI-агент Знижок", page_icon="🛍️")
 st.title("🛍️ AI-агент: Шопінг-помічник")
 
-api_key = st.text_input("Введіть свій Google Gemini API Key:", type="password")
+api_key = st.text_input("Введіть свій Google Gemini API Key (починається з AIza...):", type="password")
 
 if "messages" not in st.session_state:
     st.session_state.messages = []
@@ -21,7 +21,7 @@ for message in st.session_state.messages:
 
 if user_prompt := st.chat_input("Наприклад: Скільки коштуватиме куртка за 2400 грн зі знижкою 15%?"):
     if not api_key:
-        st.error("Будь ласка, вкажіть API ключ у полі вище.")
+        st.error("Введіть свій Gemini API Key у полі вище!")
         st.stop()
 
     st.session_state.messages.append({"role": "user", "content": user_prompt})
@@ -29,11 +29,7 @@ if user_prompt := st.chat_input("Наприклад: Скільки коштув
         st.markdown(user_prompt)
 
     try:
-        # Для ключів формату AQ. ключ потрібно додатково передавати в http_options
-        client = genai.Client(
-            api_key=api_key,
-            http_options={'headers': {'x-goog-api-key': api_key}}
-        )
+        client = genai.Client(api_key=api_key.strip())
 
         config = types.GenerateContentConfig(
             tools=[calculate_discount],

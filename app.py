@@ -10,7 +10,7 @@ def calculate_discount(price: float, discount_percent: float) -> str:
 st.set_page_config(page_title="AI-агент Знижок", page_icon="🛍️")
 st.title("🛍️ AI-агент: Шопінг-помічник")
 
-api_key = st.sidebar.text_input("AQ.Ab8RN6IlbP2uOLi0YcdEz0F-ryXIBuAOWOzw1fix7DIIhDcgIA", type="password")
+api_key = "AQ.Ab8RN6IlbP2uOLi0YcdEz0F-ryXIBuAOWOzw1fix7DIIhDcgIA"
 
 if "messages" not in st.session_state:
     st.session_state.messages = []
@@ -18,11 +18,6 @@ if "messages" not in st.session_state:
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
-
-if user_prompt := st.chat_input("Наприклад: Скільки коштуватиме куртка за 2400 грн зі знижкою 15%?"):
-    if not api_key:
-        st.error("Будь ласка, вкажіть ваш Gemini API Key у бічному меню!")
-        st.stop()
 
     st.session_state.messages.append({"role": "user", "content": user_prompt})
     with st.chat_message("user"):
